@@ -1,0 +1,16 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: service-a
+spec:
+  hosts:
+    - service-a.a.svc.cluster.local
+  http:
+    - route:
+        - destination:
+            host: service-a.a.svc.cluster.local
+      # This basically eliminates in-application retries
+      retries:
+        attempts: 5
+        perTryTimeout: 2s
+        retryOn: 5xx,gateway-error,connect-failure,refused-stream,reset,retriable-status-codes
