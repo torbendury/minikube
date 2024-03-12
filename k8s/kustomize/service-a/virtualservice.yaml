@@ -24,6 +24,13 @@ spec:
         attempts: 5
         perTryTimeout: 1s
         retryOn: 5xx,gateway-error,connect-failure,refused-stream,reset,retriable-status-codes
+    # ! Our devs didnt tell anyone but us about the new path they use so we will redirect
+    - redirect:
+        uri: "/new-route"
+      match:
+        - uri:
+            prefix: "/old-route"
+          ignoreUriCase: true
     - route:
         - destination:
             host: service-a.a.svc.cluster.local
