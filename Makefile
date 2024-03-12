@@ -3,10 +3,10 @@ all: cluster apps deploy
 
 cluster:
 	minikube start
-	kubectx minikube
+	kubectl ctx minikube
 	istioctl install -y
-	kubectl create ns a
-	kubectl create ns b
+	kubectl create ns a || true
+	kubectl create ns b || true
 
 apps:
 	docker build -t torbendury/service-a:latest -f applications/Dockerfile --build-arg SERVICE_DIRECTORY=service-a applications/service-a
