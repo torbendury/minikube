@@ -18,6 +18,7 @@ apps:
 	minikube image load service-a.tar
 	minikube image load service-b.tar
 	minikube image load service-b-canary.tar
+	rm service-a.tar service-b.tar service-b-canary.tar
 
 deploy:
 	kubectl apply -k k8s/kustomize
