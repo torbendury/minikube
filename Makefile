@@ -19,3 +19,6 @@ apps:
 deploy:
 	kubectl apply -k k8s/kustomize
 	istioctl install -f k8s/istio/istiooperator.yaml -y
+
+destroy:
+	minikube delete

@@ -9,8 +9,31 @@ spec:
     - route:
         - destination:
             host: service-a.a.svc.cluster.local
-      # This basically eliminates in-application retries
+      match:
+        - uri:
+            prefix: "/random-delay"
+          ignoreUriCase: true
+        - uri:
+            prefix: "/random-fail"
+          ignoreUriCase: true
+      # ! This endpoint sometimes responds slowly due to a slow dependency.
+      # ! We're adding a timeout to mitigate the issue.
+      # ! This way, we don't need clients to implement timeouts.
+      timeout: 1s
+      retries:
+        attempts: 5
+        perTryTimeout: 1s
+        retryOn: 5xx,gateway-error,connect-failure,refused-stream,reset,retriable-status-codes
+    - route:
+        - destination:
+            host: service-a.a.svc.cluster.local
+      # ! Not every request can be retried, the server should decide
+      # ! if it is possible.
       retries:
         attempts: 5
         perTryTimeout: 2s
-        retryOn: 5xx,gateway-error,connect-failure,refused-stream,reset,retriable-status-codes
+        retryOn: retriable-headers
+      headers:
+        request:
+          set:
+            x-envoy-retriable-header-names: "x-upstream-retry,x-try-again"

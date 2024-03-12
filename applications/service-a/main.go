@@ -10,6 +10,10 @@ import (
 var delayer <-chan time.Time
 var seconds time.Duration
 
+func oopsie() bool {
+	return rand.Intn(10) < 5
+}
+
 func main() {
 	srv := http.NewServeMux()
 
@@ -21,8 +25,7 @@ func main() {
 	})
 
 	srv.HandleFunc("/random-fail", func(w http.ResponseWriter, r *http.Request) {
-		num := rand.Intn(10)
-		if num < 5 {
+		if oopsie() {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte("Failed"))
 			return
@@ -31,9 +34,18 @@ func main() {
 	})
 
 	srv.HandleFunc("/random-delay", func(w http.ResponseWriter, r *http.Request) {
-		num := rand.Intn(10)
-		if num < 5 {
+		if oopsie() {
 			<-delayer
+		}
+		w.Write([]byte("Success"))
+	})
+
+	srv.HandleFunc("/retriable", func(w http.ResponseWriter, r *http.Request) {
+		if oopsie() {
+			w.Header().Set("x-try-again", "true")
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Failed"))
+			return
 		}
 		w.Write([]byte("Success"))
 	})
