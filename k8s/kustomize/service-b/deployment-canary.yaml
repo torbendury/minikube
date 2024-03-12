@@ -3,10 +3,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: service-b
+  name: service-b-canary
   labels:
+    # ! Important, this should be the same as the one in the service-b deployment
     app: service-b
-    version: stable
+    version: canary
 spec:
   replicas: 1
   selector:
@@ -16,11 +17,11 @@ spec:
     metadata:
       labels:
         app: service-b
-        version: stable
+        version: canary
     spec:
       containers:
-        - name: service-b
-          image: torbendury/service-b:latest
+        - name: service-b-canary
+          image: torbendury/service-b-canary:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
@@ -35,4 +36,4 @@ spec:
             failureThreshold: 3
           env:
             - name: ENABLE_BETA_FEATURE
-              value: "false"
+              value: "true"
